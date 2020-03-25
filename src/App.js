@@ -14,6 +14,9 @@ function App() {
   return (
     <Container>
       <Row className='mt-2'>
+        <h3>Calculator using React Hooks + RxJS</h3>
+      </Row>
+      <Row className='mt-2'>
         <Col xs={3}>
           <InputBox />
         </Col>

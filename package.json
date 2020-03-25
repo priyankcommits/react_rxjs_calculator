@@ -1,17 +1,18 @@
 {
-  "name": "react_rxjs_calculator_2",
+  "name": "react_rxjs_calculator",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
     "bootstrap": "^4.4.1",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "rxjs": "^6.5.4"
+    "rxjs": "^6.5.4",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -29,9 +30,14 @@
       "not op_mini all"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "last 5 chrome version",
+      "last 5 firefox version",
+      "last 5 safari version"
     ]
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:priyankcommits/react_rxjs_calculator.git"
   }
 }

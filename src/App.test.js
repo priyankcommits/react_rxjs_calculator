@@ -1,9 +1,19 @@
+import Enzyme, { mount } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 import React from 'react';
-import { render } from '@testing-library/react';
+
+Enzyme.configure({ adapter: new Adapter() });
+
 import App from './App';
 
-test('renders learn react link', () => {
-  const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+describe('App Component' , () => {
+  let wrapper;
+  beforeEach(() => {
+    wrapper = mount(<App />);
+  });
+
+  it('renders app component', () => {
+    expect(wrapper.find('h3').text()).toEqual('Calculator using React Hooks + RxJS');
+  })
+
 });
