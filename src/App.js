@@ -17,12 +17,12 @@ function App() {
         <h3>Calculator using React Hooks + RxJS</h3>
       </Row>
       <Row className='mt-2'>
-        <Col xs={3}>
+        <Col md={3}>
           <InputBox />
         </Col>
       </Row>
       <Row className='mt-2'>
-        <Col xs={6}>
+        <Col md={6}>
           <ButtonLayout />
         </Col>
       </Row>

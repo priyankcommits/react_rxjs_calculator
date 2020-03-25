@@ -6,15 +6,15 @@ import numberEvent$ from '../events';
 
 function InputBox() {
 
-  const inputValueRef = useRef(0);
+  const inputValueRef = useRef("0");
 
   const changeInputValue = value => {
-    inputValueRef.current.value =  `${inputValueRef.current.value}${value}`;
+    inputValueRef.current.value =  "0";
   }
 
   useEffect(() => {
-    numberEvent$.subscribe(number => {
-      changeInputValue(number)
+    numberEvent$.subscribe(({value, type}) => {
+      console.log(value, type);
     });
     return () => numberEvent$.unsubscribe();
   }, []);
@@ -22,7 +22,7 @@ function InputBox() {
   console.log('Rendering InputBox')
   return (
     <Row>
-      <Form.Control className='mx-3' size="md" type="text" ref={inputValueRef} value={inputValueRef.current.value} />
+      <Form.Control className='mx-3' size="md" type="text" ref={inputValueRef}/>
     </Row>
   )
 }

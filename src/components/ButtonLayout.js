@@ -3,36 +3,34 @@ import Col from 'react-bootstrap/Col';
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 
+import calculatorButtons from '../constants';
 import numberEvent$ from '../events';
 
 function ButtonLayout() {
   
-  const publishNumberEvent = value => {
-    numberEvent$.next(value);
+  const publishButtonEvent = (value, type) => {
+    numberEvent$.next({value, type});
   }
-  
+
+  let chunkedCalculatorButtons = [];
+  for(let i = 0; i < calculatorButtons.length; i += 6)
+    chunkedCalculatorButtons.push(calculatorButtons.slice(i, i + 6));
+
   console.log('Rendering Button Layout');
   return (
-    <Row>
-      <Col xs={2}>
-        <Button className='w-100' variant='secondary'>sin</Button>
-      </Col>
-      <Col xs={2}>
-        <Button className='w-100' variant='secondary'>ln</Button>
-      </Col>
-      <Col xs={2}>
-        <Button onClick={() => publishNumberEvent(7)}  className='w-100' variant='light'>7</Button>
-      </Col>
-      <Col xs={2}>
-        <Button onClick={() => publishNumberEvent(8)}  className='w-100' variant='light'>8</Button>
-      </Col>
-      <Col xs={2}>
-        <Button onClick={() => publishNumberEvent(9)}  className='w-100' variant='light'>9</Button>
-      </Col>
-      <Col xs={2}>
-        <Button className='w-100' variant='primary'>/</Button>
-      </Col>
-    </Row>
+    <div>
+      {chunkedCalculatorButtons.map((chunk, index) => (
+        <Row key={index} className='mt-2'>
+          {chunk.map((button, buttonIndex) => (
+            <Col key={buttonIndex} xs={2}>
+              <Button className='w-100' variant={button.color} onClick={() => publishButtonEvent(button.value, button.type)}>
+                {button.value}
+              </Button>
+            </Col>
+          ))}
+        </Row>
+      ))}
+    </div>
   );
 }
 
