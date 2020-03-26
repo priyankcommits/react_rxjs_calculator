@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
 
-const numberEvent$ = new BehaviorSubject(0);
+export const buttonEvent$ = new BehaviorSubject(0);
 
-export default numberEvent$;
+export const operationEvent$ = new BehaviorSubject(0);

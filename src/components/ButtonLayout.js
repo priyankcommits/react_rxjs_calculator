@@ -4,12 +4,12 @@ import React from 'react';
 import Row from 'react-bootstrap/Row';
 
 import calculatorButtons from '../constants';
-import numberEvent$ from '../events';
+import { buttonEvent$ } from '../events';
 
 function ButtonLayout() {
   
   const publishButtonEvent = (value, type) => {
-    numberEvent$.next({value, type});
+    buttonEvent$.next({value, type});
   }
 
   let chunkedCalculatorButtons = [];
@@ -24,7 +24,7 @@ function ButtonLayout() {
           {chunk.map((button, buttonIndex) => (
             <Col key={buttonIndex} xs={2}>
               <Button className='w-100' variant={button.color} onClick={() => publishButtonEvent(button.value, button.type)}>
-                {button.value}
+                {button.value.name}
               </Button>
             </Col>
           ))}
