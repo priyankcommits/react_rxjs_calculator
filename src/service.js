@@ -1,6 +1,6 @@
 import { operators } from './constants';
 
-async function mathService(operandOne, operandTwo, operatorFunction) {
+async function mathService(operandOne, operandTwo, operatorFunction, functionValue) {
     await setTimeout(() => {}, 1000);
     switch(operatorFunction) {
         case operators.PLUS:

@@ -1,88 +1,92 @@
-import React, { useEffect, useReducer } from 'react';
-import { skip } from 'rxjs/operators';
+import React, { useEffect, useState } from 'react';
+import { skip, take } from 'rxjs/operators';
 
-import { buttonEvent$, operationEvent$ } from '../events';
+import { buttonEvent$, operationEvent$, resultEvent$ } from '../events';
 import { buttonTypes, operators } from '../constants';
-
-const initialState = {
-  operandOneValue: '',
-  operandOnefunctionValue: '',
-  operandOneFunctionStartsWith: '',
-  operandOneFunctionEndsWith: '',
-  operandTwoValue: '',
-  operandTwoFunctionValue: '',
-  operandTwoFunctionStartsWith: '',
-  operandTwoFunctionEndsWith: '',
-  currentOperator: '',
-  value: ''
-}
-
-const inputReducer = (state, data) => {
-  switch (data.type) {
-    case buttonTypes.RESET:
-      return initialState;
-    case buttonTypes.OPERATOR:
-      console.log(state);
-      if (state.currentOperator !== '') {
-        state.operandTwoValue = '';
-      }
-      state.currentOperator = data.value.name;
-      return {
-        ...state,
-        value: `${state.operandOneFunctionStartsWith}${state.operandOneValue}${state.operandOneFunctionEndsWith} ${data.value.name} ${state.operandTwoFunctionStartsWith}${state.operandTwoValue}${state.operandTwoFunctionEndsWith}`
-      };
-    case buttonTypes.FUNCTION:
-      if (state.currentOperator === '') {
-        state.operandOneFunctionValue = data.value.name;
-        state.operandOneFunctionStartsWith = data.value.startsWith;
-        state.operandOneFunctionEndsWith = data.value.endsWith;
-      } else {
-        state.operandTwoFunctionValue = data.value.name;
-        state.operandTwoFunctionStartsWith = data.value.startsWith;
-        state.operandTwoFunctionEndsWith = data.value.endsWith;
-      }
-      if (state.value === initialState.value) return {...state, value: initialState.value};
-      else {
-        state.operandOneValue = state.value;
-        state.currentOperator = operators.MULTIPLY;
-        return {...state};
-      }
-    default:
-      if (state.currentOperator === '') {
-        return {
-          ...state,
-          operandOneValue: `${state.operandOneValue}${data.value.name}`,
-          value: `${state.operandOneFunctionStartsWith}${state.operandOneValue}${data.value.name}${state.operandOneFunctionEndsWith} ${state.currentOperator} ${state.operandTwoFunctionStartsWith}${state.operandTwoValue}${state.operandTwoFunctionEndsWith}`
-        };
-      }
-      return {
-        ...state,
-        operandTwoValue: `${state.operandTwoValue}${data.value.name}`,
-        value: `${state.operandOneFunctionStartsWith}${state.operandOneValue}${state.operandOneFunctionEndsWith} ${state.currentOperator} ${state.operandTwoFunctionStartsWith}${state.operandTwoValue}${data.value.name}${state.operandTwoFunctionEndsWith}`
-      };
-  }
-}
+import { BoxStyled } from '../styles';
 
 function InputBox() {
 
-  const [inputValue, changeInputValue] = useReducer(inputReducer, initialState);
+  const operandInitialState = {
+    value: '',
+    functionValue: '',
+    functionStartsWith: '',
+    functionEndsWith: ''
+  }
+  const operatorInitialState = '';
+
+  const [operandOne, setOperandOne] = useState(operandInitialState);
+  const [operandTwo, setOperandTwo] = useState(operandInitialState);
+  const [operator, setOperator] = useState(operatorInitialState);
+
+  const reset = () => {
+    setOperandOne(operandInitialState);
+    setOperandTwo(operandInitialState);
+    setOperator('');
+  }
+
+  const handleButtonEvent = (value, type) => {
+    switch (type) {
+      case buttonTypes.RESET:
+        reset();
+        break;
+      case buttonTypes.OPERATOR:
+        setOperator(prevOperatorState => {
+          if (prevOperatorState !== '') {
+            operationEvent$.next(
+              operandOne, operandTwo, operator);
+            resultEvent$.pipe(take(1)).subscribe(data => {
+              console.log(data);
+              setOperandTwo(operatorInitialState);
+            });
+          }
+          return prevOperatorState;
+        });
+        setOperator(() => { return value.name});
+        break;
+      case buttonTypes.FUNCTION:
+        setOperator(prevOperatorState => {
+          const changeFunctionValue = (prevState => { return {...prevState, functionValue: value.name, functionStartsWith: value.startsWith, functionEndsWith: value.endsWith}});
+          prevOperatorState === '' ? setOperandOne(changeFunctionValue) : setOperandTwo(changeFunctionValue);
+          return prevOperatorState;
+        });
+        break;
+      case buttonTypes.NUMBER:
+        setOperator(prevOperatorState => {
+          const changeNumber = (prevState => { return {...prevState, value: `${prevState.value}${value.name}`}});
+          prevOperatorState === '' ? setOperandOne(changeNumber) : setOperandTwo(changeNumber);
+          return prevOperatorState;
+        });
+        break;
+      default:
+        reset();
+    }
+  }
 
   useEffect(() => {
     buttonEvent$.pipe(skip(1)).subscribe(({value, type}) => {
-      changeInputValue({value, type});
+      handleButtonEvent(value, type);
     });
-    return () => buttonEvent$.unsubscribe();
+    return () => {
+      buttonEvent$.unsubscribe();
+      operationEvent$.unsubscribe();
+      resultEvent$.unsubscribe();
+    }
   }, []);
 
   console.log('Rendering InputBox')
   return (
-    <div className='text-right'>
-      <p>
-        <span>
-          {inputValue.value}
-        </span>
-      </p>
-    </div>
+    <BoxStyled>
+      <div>
+        <span>{operandOne.functionStartsWith}</span>
+        <span>{operandOne.value}</span>
+        <span>{operandOne.functionEndsWith}</span>
+        <span>{` ${operator} `}</span>
+        <span>{operandTwo.functionStartsWith}</span>
+        <span>{operandTwo.value}</span>
+        <span>{operandTwo.functionEndsWith}</span>
+      </div>
+    </BoxStyled>
   )
 }
 
