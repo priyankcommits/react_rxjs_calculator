@@ -1,40 +1,41 @@
 import React, { useEffect, useState } from 'react';
 import { skip } from 'rxjs/operators';
 
+import mathService from '../services/mathService';
 import { BoxStyled } from '../styles';
-import { operationEvent$ } from '../events';
-import mathService from '../service';
+import { operationEvent$, resultEvent$ } from '../events';
 
-const initialState = {
-  value: '',
-}
+const initialState = '';
 
 function OutputBox() {
 
-  const [outputValue, changeOutputValue] = useState('');
+  const [outputValue, changeOutputValue] = useState(initialState);
 
-  const executeMathFunction = ((operandOne, operandTwo, operator, functionValue) => {
+  const executeMathFunction = ((operandOne, operandTwo, operator) => {
     const result = async () => {
-      let response = await mathService(operandOne, operandTwo, operator, functionValue);
+      let response = await mathService(operandOne, operandTwo, operator);
       changeOutputValue(response);
-    }
+      resultEvent$.next(response);
+    };
+    result();
   });
+
   useEffect(() => {
     operationEvent$.pipe(skip(1)).subscribe(data => {
       console.log(data);
-      // executeMathFunction(operandOne, operandTwo, operator, functionValue);
+      if (data.result) changeOutputValue(initialState);
+      else executeMathFunction(data.operandOne, data.operandTwo, data.operator);
     });
     return () => {
       operationEvent$.unsubscribe();
+      resultEvent$.unsubscribe();
     }
   }, []);
 
   console.log('Rendering OutputBox')
   return (
     <BoxStyled>
-      <div>
-        {outputValue}
-      </div>
+      {outputValue}
     </BoxStyled>
   )
 }
