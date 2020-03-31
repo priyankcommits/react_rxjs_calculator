@@ -11,7 +11,6 @@ function ButtonLayout(props) {
     buttonEvent$.next({value, type});
   }
 
-  console.log('Rendering Button Layout');
   return (
     <div>
       <Row className='mt-2'>

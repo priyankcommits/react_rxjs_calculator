@@ -12,7 +12,6 @@ import { AppStyled, BoxStyled } from './styles';
 
 function App() {
 
-  console.log('Rendering App')
   return (
     <Container as={AppStyled}>
       <Row className='mt-2'>

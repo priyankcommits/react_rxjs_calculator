@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { skip } from 'rxjs/operators';
+import { skip, delay } from 'rxjs/operators';
 
 import mathService from '../services/mathService';
 import { BoxStyled } from '../styles';
@@ -22,12 +22,12 @@ function OutputBox() {
   });
 
   useEffect(() => {
-    resultEvent$.pipe(skip(1)).subscribe(data => {
+    const resultEvent = resultEvent$.pipe(skip(1));
+    resultEvent.pipe(delay(333)).subscribe(data => {
       executeMathFunction(data);
     });
   }, [previousAnswer]);
 
-  console.log('Rendering OutputBox')
   return (
     <BoxStyled>
       {outputValue}

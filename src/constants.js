@@ -3,11 +3,13 @@ export const buttonTypes = {
     OPERATOR: 'operator',
     FUNCTION: 'function',
     CONSTANT: 'constant',
-    RESET: 'reset',
+    RESET: 'AC',
     PARANTHESIS_OPEN: '(',
     PARANTHESIS_CLOSE: ')',
     POINT: '.',
     ANSWER: 'Ans',
+    UNDO: 'Undo',
+    REDO: 'Redo',
 }
 
 export const operators = {
@@ -42,10 +44,12 @@ const claculatorButtons = [
     {value: {name: 'e'}, type: buttonTypes.CONSTANT, color: 'secondary'},
     {value: {name: '0'}, type: buttonTypes.NUMBER, color: 'light'},
     {value: {name: buttonTypes.POINT}, type: buttonTypes.POINT, color: 'light'},
-    {value: {name: 'AC'}, type: buttonTypes.RESET, color: 'primary'},
+    {value: {name: buttonTypes.RESET}, type: buttonTypes.RESET, color: 'primary'},
     {value: {name: operators.PLUS}, type: buttonTypes.OPERATOR, color: 'secondary'},
     {value: {name: buttonTypes.PARANTHESIS_OPEN}, type: buttonTypes.PARANTHESIS_OPEN, color: 'secondary'},
     {value: {name: buttonTypes.PARANTHESIS_CLOSE}, type: buttonTypes.PARANTHESIS_CLOSE, color: 'secondary'},
+    {value: {name: buttonTypes.UNDO}, type: buttonTypes.UNDO, color: 'warning'},
+    {value: {name: buttonTypes.REDO}, type: buttonTypes.REDO, color: 'warning'},
     {value: {name: buttonTypes.ANSWER}, type: buttonTypes.CONSTANT, color: 'primary'},
     {value: {name: operators.MODULUS}, type: buttonTypes.OPERATOR, color: 'secondary'},
 ]

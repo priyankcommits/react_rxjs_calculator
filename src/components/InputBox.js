@@ -7,10 +7,10 @@ import { buttonTypes, operators } from '../constants';
 
 const initialState = {
   entries: [],
+  historyEntries: [],
   value: '',
   paranthesisCount: 0,
   canAddEntry: true,
-  canExecute: false,
 }
 
 const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
@@ -28,7 +28,6 @@ const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
       return {
         ...initialState,
         value: value,
-        canExecute: true,
       }
     case buttonTypes.OPERATOR:
       if (!previousTypeIsOperator && !previousTypeIsParanthesisOpen) {
@@ -74,7 +73,6 @@ const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
       return {
         ...initialState,
         value: value,
-        canExecute: true,
       }
     default:
       return {
@@ -86,28 +84,55 @@ const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
 const reducer = (state, action) => {
   if (action.type === buttonTypes.RESET) return {...initialState};
 
-  if (state.entries.length === 0) {
+   if (state.entries.length === 0 && ![buttonTypes.UNDO, buttonTypes.REDO].includes(action.type)) {
     const newState = ruleBook(null, action);
     newState.entries = [action];
     return {...newState};
   }
 
-  let newState = {...initialState};
-  newState.paranthesisCount = state.paranthesisCount;
-  let previousType = null;
-  let canPoint = true;
-  state.entries.forEach(entry => {
-    const result = ruleBook(previousType, entry, newState.paranthesisCount, canPoint);
-    newState.value += result.value;
-    newState.entries = [...newState.entries, entry];
-    newState.paranthesisCount += result.paranthesisCount;
-    previousType = entry.type;
-    if (entry.type === buttonTypes.POINT) canPoint = false;
-    if (entry.type === buttonTypes.OPERATOR && !canPoint) canPoint = true;
-  });
+  const getNewState = state => {
+    let newState = {...initialState};
+    let previousType = null;
+    let canPoint = true;
+    newState.paranthesisCount = state.paranthesisCount;
+    state.entries.forEach(entry => {
+      const result = ruleBook(previousType, entry, newState.paranthesisCount, canPoint);
+      newState.value = `${newState.value}${result.value}`;
+      newState.entries = [...newState.entries, entry];
+      newState.paranthesisCount += result.paranthesisCount;
+      previousType = entry.type;
+      if (entry.type === buttonTypes.POINT) canPoint = false;
+      if (entry.type === buttonTypes.OPERATOR && !canPoint) canPoint = true;
+    });
+    return {newState, previousType, canPoint};
+  }
 
+  if (action.type === buttonTypes.UNDO) {
+    const lastEntry = state.entries[state.entries.length - 1];
+    if (lastEntry) {
+      const newState = getNewState({...state, entries: state.entries.slice(0, state.entries.length - 1)}).newState;
+      return {
+        ...newState,
+        entries: state.entries.slice(0, state.entries.length - 1),
+        historyEntries: [...state.historyEntries, lastEntry],
+      }
+    } else return state;
+  }
+  if (action.type === buttonTypes.REDO) {
+    const lastHistoryEntry = state.historyEntries[state.historyEntries.length - 1];
+    if (lastHistoryEntry) {
+      const newState = getNewState({...state, entries: [...state.entries, lastHistoryEntry]}).newState;
+      return {
+        ...newState,
+        historyEntries: state.historyEntries.slice(0, state.historyEntries.length - 1),
+        entries: [...state.entries, lastHistoryEntry],
+      }
+    } else return state;
+  }
+
+  const {newState, previousType, canPoint} = getNewState(state);
   const result = ruleBook(previousType, action, newState.paranthesisCount, canPoint);
-  newState.value += result.value;
+  newState.value = `${newState.value}${result.value}`;
   if (result.canAddEntry) newState.entries = [...newState.entries, action];
   newState.paranthesisCount += result.paranthesisCount;
   return {...newState};
@@ -131,7 +156,6 @@ function InputBox() {
     resultEvent$.next(inputState.value);
   }, [inputState]);
 
-  console.log('Rendering InputBox')
   return (
     <BoxStyled>
       {inputState.value}
