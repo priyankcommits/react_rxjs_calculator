@@ -3,34 +3,29 @@ import { skip } from 'rxjs/operators';
 
 import mathService from '../services/mathService';
 import { BoxStyled } from '../styles';
-import { operationEvent$, resultEvent$ } from '../events';
-
-const initialState = '';
+import { resultEvent$ } from '../events';
 
 function OutputBox() {
 
-  const [outputValue, changeOutputValue] = useState(initialState);
+  const [outputValue, setOutputValue] = useState('');
+  const [previousAnswer, setPreviousAsnwer] = useState('');
 
-  const executeMathFunction = ((operandOne, operandTwo, operator) => {
+  const executeMathFunction = ((data) => {
     const result = async () => {
-      let response = await mathService(operandOne, operandTwo, operator);
-      changeOutputValue(response);
-      resultEvent$.next(response);
+      let response = await mathService(data, previousAnswer);
+      if (response !== null) {
+        setOutputValue(response);
+        setPreviousAsnwer(response);
+      }
     };
     result();
   });
 
   useEffect(() => {
-    operationEvent$.pipe(skip(1)).subscribe(data => {
-      console.log(data);
-      if (data.result) changeOutputValue(initialState);
-      else executeMathFunction(data.operandOne, data.operandTwo, data.operator);
+    resultEvent$.pipe(skip(1)).subscribe(data => {
+      executeMathFunction(data);
     });
-    return () => {
-      operationEvent$.unsubscribe();
-      resultEvent$.unsubscribe();
-    }
-  }, []);
+  }, [previousAnswer]);
 
   console.log('Rendering OutputBox')
   return (

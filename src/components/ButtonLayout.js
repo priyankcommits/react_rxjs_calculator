@@ -3,33 +3,26 @@ import Col from 'react-bootstrap/Col';
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 
-import calculatorButtons from '../constants';
 import { buttonEvent$ } from '../events';
 
-function ButtonLayout() {
+function ButtonLayout(props) {
   
   const publishButtonEvent = (value, type) => {
     buttonEvent$.next({value, type});
   }
 
-  let chunkedCalculatorButtons = [];
-  for(let i = 0; i < calculatorButtons.length; i += 6)
-    chunkedCalculatorButtons.push(calculatorButtons.slice(i, i + 6));
-
   console.log('Rendering Button Layout');
   return (
     <div>
-      {chunkedCalculatorButtons.map((chunk, index) => (
-        <Row key={index} className='mt-2'>
-          {chunk.map((button, buttonIndex) => (
-            <Col key={buttonIndex} xs={2}>
-              <Button className='w-100' variant={button.color} onClick={() => publishButtonEvent(button.value, button.type)}>
-                {button.value.name}
-              </Button>
-            </Col>
-          ))}
-        </Row>
-      ))}
+      <Row className='mt-2'>
+        {props.buttons.map((button, index) => (
+          <Col key={index} xs={2} className='my-1'>
+            <Button className='w-100' variant={button.color} onClick={() => publishButtonEvent(button.value, button.type)}>
+              {button.value.name}
+            </Button>
+          </Col>
+        ))}
+      </Row>
     </div>
   );
 }

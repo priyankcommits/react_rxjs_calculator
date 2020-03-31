@@ -4,6 +4,10 @@ export const buttonTypes = {
     FUNCTION: 'function',
     CONSTANT: 'constant',
     RESET: 'reset',
+    PARANTHESIS_OPEN: '(',
+    PARANTHESIS_CLOSE: ')',
+    POINT: '.',
+    ANSWER: 'Ans',
 }
 
 export const operators = {
@@ -12,28 +16,23 @@ export const operators = {
     MULTIPLY: 'x',
     DIVIDE: '÷',
     POWER: 'pow',
-}
-
-export const functions = {
-    SIN: 'sin',
-    COS: 'cos',
-    TAN: 'tan',
+    MODULUS: '%',
 }
 
 const claculatorButtons = [
-    {value: {name: functions.SIN, startsWith: 'sin(', endsWith: ')'}, type: buttonTypes.FUNCTION, color: 'secondary'},
-    {value: {name: 'ln', startsWith: 'ln(', endsWith: ')'}, type: buttonTypes.FUNCTION, color: 'secondary'},
+    {value: {name: 'sin'}, type: buttonTypes.FUNCTION, color: 'secondary'},
+    {value: {name: 'ln'}, type: buttonTypes.FUNCTION, color: 'secondary'},
     {value: {name: '7'}, type: buttonTypes.NUMBER, color: 'light'},
     {value: {name: '8'}, type: buttonTypes.NUMBER, color: 'light'},
     {value: {name: '9'}, type: buttonTypes.NUMBER, color: 'light'},
     {value: {name: operators.DIVIDE}, type: buttonTypes.OPERATOR, color: 'secondary'},
-    {value: {name: functions.COS, startsWith: 'cos(', endsWith: ')'}, type: buttonTypes.FUNCTION, color: 'secondary'},
-    {value: {name: 'log', startsWith: 'log(', endsWith: ')'}, type: buttonTypes.FUNCTION, color: 'secondary'},
+    {value: {name: 'cos'}, type: buttonTypes.FUNCTION, color: 'secondary'},
+    {value: {name: 'log'}, type: buttonTypes.FUNCTION, color: 'secondary'},
     {value: {name: '4'}, type: buttonTypes.NUMBER, color: 'light'},
     {value: {name: '5'}, type: buttonTypes.NUMBER, color: 'light'},
     {value: {name: '6'}, type: buttonTypes.NUMBER, color: 'light'},
     {value: {name: operators.MULTIPLY}, type: buttonTypes.OPERATOR, color: 'secondary'},
-    {value: {name: functions.TAN, startsWith: 'tan(', endsWith: ')'}, type: buttonTypes.FUNCTION, color: 'secondary'},
+    {value: {name: 'tan'}, type: buttonTypes.FUNCTION, color: 'secondary'},
     {value: {name: 'π'}, type: buttonTypes.CONSTANT, color: 'secondary'},
     {value: {name: '1'}, type: buttonTypes.NUMBER, color: 'light'},
     {value: {name: '2'}, type: buttonTypes.NUMBER, color: 'light'},
@@ -42,9 +41,13 @@ const claculatorButtons = [
     {value: {name: operators.POWER}, type: buttonTypes.OPERATOR, color: 'secondary'},
     {value: {name: 'e'}, type: buttonTypes.CONSTANT, color: 'secondary'},
     {value: {name: '0'}, type: buttonTypes.NUMBER, color: 'light'},
-    {value: {name: '.'}, type: buttonTypes.NUMBER, color: 'light'},
+    {value: {name: buttonTypes.POINT}, type: buttonTypes.POINT, color: 'light'},
     {value: {name: 'AC'}, type: buttonTypes.RESET, color: 'primary'},
-    {value: {name: operators.PLUS}, type: buttonTypes.OPERATOR, color: 'secondary'}
+    {value: {name: operators.PLUS}, type: buttonTypes.OPERATOR, color: 'secondary'},
+    {value: {name: buttonTypes.PARANTHESIS_OPEN}, type: buttonTypes.PARANTHESIS_OPEN, color: 'secondary'},
+    {value: {name: buttonTypes.PARANTHESIS_CLOSE}, type: buttonTypes.PARANTHESIS_CLOSE, color: 'secondary'},
+    {value: {name: buttonTypes.ANSWER}, type: buttonTypes.CONSTANT, color: 'primary'},
+    {value: {name: operators.MODULUS}, type: buttonTypes.OPERATOR, color: 'secondary'},
 ]
 
 export default claculatorButtons;

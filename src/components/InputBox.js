@@ -1,125 +1,140 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { skip } from 'rxjs/operators';
 
 import { BoxStyled } from '../styles';
-import { buttonEvent$, operationEvent$, resultEvent$ } from '../events';
+import { buttonEvent$, resultEvent$ } from '../events';
 import { buttonTypes, operators } from '../constants';
+
+const initialState = {
+  entries: [],
+  value: '',
+  paranthesisCount: 0,
+  canAddEntry: true,
+  canExecute: false,
+}
+
+const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
+  let value = '';
+  const previousTypeIsFunction = previousType === buttonTypes.FUNCTION;
+  const previousTypeIsOperator = previousType === buttonTypes.OPERATOR;
+  const previousTypeIsNull = previousType === null;
+  const previousTypeIsParanthesisOpen = previousType === buttonTypes.PARANTHESIS_OPEN;
+  const previousTypeIsParanthesisClose = previousType === buttonTypes.PARANTHESIS_CLOSE;
+
+  switch (currentEntry.type) {
+    case buttonTypes.NUMBER:
+      value = `${currentEntry.value.name}`;
+      if (previousTypeIsParanthesisClose) value = ` ${operators.MULTIPLY} ${value}`;
+      return {
+        ...initialState,
+        value: value,
+        canExecute: true,
+      }
+    case buttonTypes.OPERATOR:
+      if (!previousTypeIsOperator && !previousTypeIsParanthesisOpen) {
+        return {
+          ...initialState,
+          value: ` ${currentEntry.value.name} `,
+        }
+      } else {
+        return {...initialState, canAddEntry: false};
+      }
+    case buttonTypes.FUNCTION:
+      value = `${currentEntry.value.name}${buttonTypes.PARANTHESIS_OPEN}`;
+      if (!previousTypeIsOperator && !previousTypeIsNull && !previousTypeIsFunction) value = ` ${operators.MULTIPLY} ${value}`;
+      return {
+        ...initialState,
+        value: value,
+        paranthesisCount: 1,
+      }
+    case buttonTypes.PARANTHESIS_OPEN:
+      return {
+        ...initialState,
+        value: `${currentEntry.value.name}`,
+        paranthesisCount: 1,
+      }
+    case buttonTypes.PARANTHESIS_CLOSE:
+      if (paranthesisCount > 0) {
+        return {
+          ...initialState,
+          value: `${currentEntry.value.name}`,
+          paranthesisCount: -1,
+        }
+      } else return {...initialState, canAddEntry: false};
+    case buttonTypes.POINT:
+      if (canPoint) {
+        return {
+          ...initialState,
+          value: `${currentEntry.value.name}`,
+        }
+      } else return {...initialState, canAddEntry: false};
+    case buttonTypes.CONSTANT:
+      value = `${currentEntry.value.name}`;
+      if (!previousTypeIsOperator && !previousTypeIsNull && !previousTypeIsFunction) value = ` ${operators.MULTIPLY} ${value}`;
+      return {
+        ...initialState,
+        value: value,
+        canExecute: true,
+      }
+    default:
+      return {
+        ...initialState,
+      }
+  }
+}
+
+const reducer = (state, action) => {
+  if (action.type === buttonTypes.RESET) return {...initialState};
+
+  if (state.entries.length === 0) {
+    const newState = ruleBook(null, action);
+    newState.entries = [action];
+    return {...newState};
+  }
+
+  let newState = {...initialState};
+  newState.paranthesisCount = state.paranthesisCount;
+  let previousType = null;
+  let canPoint = true;
+  state.entries.forEach(entry => {
+    const result = ruleBook(previousType, entry, newState.paranthesisCount, canPoint);
+    newState.value += result.value;
+    newState.entries = [...newState.entries, entry];
+    newState.paranthesisCount += result.paranthesisCount;
+    previousType = entry.type;
+    if (entry.type === buttonTypes.POINT) canPoint = false;
+    if (entry.type === buttonTypes.OPERATOR && !canPoint) canPoint = true;
+  });
+
+  const result = ruleBook(previousType, action, newState.paranthesisCount, canPoint);
+  newState.value += result.value;
+  if (result.canAddEntry) newState.entries = [...newState.entries, action];
+  newState.paranthesisCount += result.paranthesisCount;
+  return {...newState};
+}
 
 function InputBox() {
 
-  const operandInitialState = {
-    value: '',
-    functionValue: '',
-    functionStartsWith: '',
-    functionEndsWith: ''
-  }
-  const operatorInitialState = '';
-
-  const [operandOne, setOperandOne] = useState(operandInitialState);
-  const [operandTwo, setOperandTwo] = useState(operandInitialState);
-  const [operator, setOperator] = useState(operatorInitialState);
-
-  const reset = () => {
-    setOperandOne(operandInitialState);
-    setOperandTwo(operandInitialState);
-    setOperator(operatorInitialState);
-  }
-
-  const sendCurrentStateValues = (operator, resetOperandTwo, reset) => {
-    setOperator(prevOperatorState => {
-      setOperandOne(prevStateOperandOne => {
-        setOperandTwo(prevStateOperandTwo => {
-          operationEvent$.next(
-            {reset: reset, operator: prevOperatorState, operandOne: prevStateOperandOne, operandTwo: prevStateOperandTwo});
-          return resetOperandTwo ? operandInitialState : prevStateOperandTwo;
-        });
-        return prevStateOperandOne;
-      });
-    return operator;
-    });
-  }
-
-  const handleButtonEvent = (value, type) => {
-    switch (type) {
-      case buttonTypes.RESET:
-        reset();
-        sendCurrentStateValues(operatorInitialState, true, true);
-        break;
-      case buttonTypes.OPERATOR:
-        setOperator(prevOperatorState => {
-          if (prevOperatorState !== operatorInitialState) {
-            sendCurrentStateValues(value.name, true, false);
-            resultEvent$.pipe(skip(1)).subscribe(data => {
-              setOperandOne({...operandInitialState, value: data});
-            });
-          }
-          return value.name;
-          // return prevOperatorState;
-        });
-        break;
-      case buttonTypes.FUNCTION:
-        setOperator(prevOperatorState => {
-          const changeFunctionValue = (prevState => {
-            return {...prevState, functionValue: value.name, functionStartsWith: value.startsWith, functionEndsWith: value.endsWith}
-          });
-          prevOperatorState === operatorInitialState ? setOperandOne(changeFunctionValue) : setOperandTwo(changeFunctionValue);
-          return prevOperatorState;
-        });
-        break;
-      case buttonTypes.CONSTANT:
-        console.log(value.name);
-        setOperandOne(prevState => {
-          if (prevState.value !== operandInitialState.value) {
-            setOperator(operators.MULTIPLY);
-            setOperandTwo(prevState => {
-              if(prevState.value !== operandInitialState.value) {
-                setOperator(prevOperatorState => {
-                  sendCurrentStateValues(prevOperatorState, true, false);
-                  return prevOperatorState;
-                });
-                return prevState
-              }
-              return {...prevState, value: value.name};
-            });
-            return prevState
-          }
-          return {...prevState, value: value.name};
-        });
-        break;
-      case buttonTypes.NUMBER:
-        setOperator(prevOperatorState => {
-          const changeNumber = (prevState => {return {...prevState, value: `${prevState.value}${value.name}`}});
-          prevOperatorState === operatorInitialState ? setOperandOne(changeNumber) : setOperandTwo(changeNumber);
-          sendCurrentStateValues(prevOperatorState, false, false);
-          return prevOperatorState;
-        });
-        break;
-      default:
-        reset();
-    }
-  }
+  const [inputState, setInputState] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    buttonEvent$.pipe(skip(1)).subscribe(({value, type}) => {
-      handleButtonEvent(value, type);
+    buttonEvent$.pipe(skip(1)).subscribe(data => {
+      setInputState(data);
     });
     return () => {
       buttonEvent$.unsubscribe();
-      operationEvent$.unsubscribe();
       resultEvent$.unsubscribe();
     }
   }, []);
 
+  useEffect(() => {
+    resultEvent$.next(inputState.value);
+  }, [inputState]);
+
   console.log('Rendering InputBox')
   return (
     <BoxStyled>
-      <span>{operandOne.functionStartsWith}</span>
-      <span>{operandOne.value}</span>
-      <span>{operandOne.functionEndsWith}</span>
-      <span>{` ${operator} `}</span>
-      <span>{operandTwo.functionStartsWith}</span>
-      <span>{operandTwo.value}</span>
-      <span>{operandTwo.functionEndsWith}</span>
+      {inputState.value}
     </BoxStyled>
   )
 }

@@ -7,7 +7,8 @@ import Row from 'react-bootstrap/Row';
 import ButtonLayout from './components/ButtonLayout';
 import InputBox from './components/InputBox';
 import OutputBox from './components/OutputBox';
-import { AppStyled } from './styles';
+import calculatorButtons from './constants';
+import { AppStyled, BoxStyled } from './styles';
 
 function App() {
 
@@ -18,16 +19,20 @@ function App() {
         <h3>Calculator using React Hooks + RxJS</h3>
       </Row>
       <Row className='mt-2'>
-        <Col md={3}>
-          <InputBox />
-        </Col>
-        <Col md={3}>
-          <OutputBox />
-        </Col>
-      </Row>
-      <Row className='mt-2'>
         <Col md={6}>
-          <ButtonLayout />
+          <BoxStyled>
+            <Row className='m-1'>
+              <Col md={6}>
+                <InputBox />
+              </Col>
+              <Col md={6}>
+                <OutputBox />
+              </Col>
+              <Col md={12}>
+                <ButtonLayout buttons={calculatorButtons} />
+              </Col>
+            </Row>
+          </BoxStyled>
         </Col>
       </Row>
     </Container>

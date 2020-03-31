@@ -1,34 +1,23 @@
-import { functions, operators } from '../constants';
+import { replaceAll } from './utils';
 
-const mathService = async (operandOne, operandTwo, operatorFunction) => {
+const mathService = async (data, previousAnswer) => {
   const timeStart = performance.now();
+  data = replaceAll(data, 'x', '*');
+  data = replaceAll(data, '÷', '/');
+  data = replaceAll(data, 'pow', '**');
+  data = replaceAll(data, 'sin', 'Math.sin');
+  data = replaceAll(data, 'cos', 'Math.cos');
+  data = replaceAll(data, 'tan', 'Math.tan');
+  data = replaceAll(data, 'log', 'Math.log10');
+  data = replaceAll(data, 'ln', 'Math.log');
+  data = replaceAll(data, 'e', 'Math.E');
+  data = replaceAll(data, 'π', 'Math.PI');
+  data = replaceAll(data, 'Ans', `${previousAnswer}`);
 
-  operandOne.value = convertStringToNumber(replaceConstants(operandOne.value));
-  operandTwo.value = convertStringToNumber(replaceConstants(operandTwo.value));
-
-  const normalizedOperandOne = normalizedValue(operandOne.value, operandOne.functionValue);
-  const normalizedOperandTwo = normalizedValue(operandTwo.value, operandTwo.functionValue);
-
-  let result;
-  switch (operatorFunction) {
-    case operators.PLUS:
-      result = add(normalizedOperandOne, normalizedOperandTwo);
-      break;
-    case operators.MINUS:
-      result = subtract(normalizedOperandOne, normalizedOperandTwo);
-      break;
-    case operators.MULTIPLY:
-      result = multiply(normalizedOperandOne, normalizedOperandTwo);
-      break;
-    case operators.DIVIDE:
-      result = divide(normalizedOperandOne, normalizedOperandTwo);
-      break;
-    case operators.POWER:
-      result = power(normalizedOperandOne, normalizedOperandTwo);
-      break;
-    default:
-      result = normalizedOperandOne;
-  }
+  let result = null;
+  try {
+    result = eval(data);
+  } catch {};
 
   const timeEnd = performance.now();
   const totalTime = timeEnd - timeStart;
@@ -37,68 +26,6 @@ const mathService = async (operandOne, operandTwo, operatorFunction) => {
     return result;
   }
   else return result;
-}
-
-const constants = {
-  E: 2.71828182846,
-  PI: 3.14159265359,
-}
-
-const replaceConstants = operandValue => {
-  if (operandValue.toString().includes('e')) return constants.E;
-  if (operandValue.toString().includes('π')) return constants.PI;
-  return operandValue;
-}
-
-const convertStringToNumber = stringOperand => {
-  console.log('this got called converting');
-  const operand = parseFloat(stringOperand);
-  return isNaN(operand) ? '' : operand;
-}
-
-const normalizedValue = (value, functionValue) => {
-  switch (functionValue) {
-    case functions.SIN:
-      return sin(value);
-    case functions.COS:
-      return cos(value)
-    case functions.TAN:
-      return tan(value);
-    default:
-      return value;
-  }
-}
-
-const add = (operandOne, operandTwo) => {
-  return operandOne + operandTwo;
-}
-
-const subtract = (operandOne, operandTwo) => {
-  return operandOne - operandTwo;
-}
-
-const multiply = (operandOne, operandTwo) => {
-  return operandOne * operandTwo;
-}
-
-const divide = (operandOne, operandTwo) => {
-  return operandOne / operandTwo;
-}
-
-const power = (operandOne, operandTwo) => {
-  return operandOne ** operandTwo;
-}
-
-const sin = (operand) => {
-  return Math.sin(operand);
-}
-
-const cos = (operand) => {
-  return Math.cos(operand);
-}
-
-const tan = (operand) => {
-  return Math.tan(operand);
 }
 
 export default mathService;
