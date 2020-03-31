@@ -1,9 +1,11 @@
+// Component to show output result and talks to math service
+// Listens to InputBox operations and Publishes to History
 import React, { useEffect, useState } from 'react';
 import { skip, delay } from 'rxjs/operators';
 
 import mathService from '../services/mathService';
-import { BoxStyled } from '../styles';
-import { resultEvent$ } from '../events';
+import { BoxStyled, OverFlowProtect } from '../styles';
+import { operationEvent$ } from '../events';
 
 function OutputBox() {
 
@@ -13,7 +15,7 @@ function OutputBox() {
   const executeMathFunction = ((data) => {
     const result = async () => {
       let response = await mathService(data, previousAnswer);
-      if (response !== null) {
+      if (response !== null && !isNaN(response)) {
         setOutputValue(response);
         setPreviousAsnwer(response);
       }
@@ -22,15 +24,19 @@ function OutputBox() {
   });
 
   useEffect(() => {
-    const resultEvent = resultEvent$.pipe(skip(1));
-    resultEvent.pipe(delay(333)).subscribe(data => {
+    const operationEvent = operationEvent$.pipe(skip(1));
+    operationEvent.pipe(delay(333)).subscribe(data => {
       executeMathFunction(data);
     });
   }, [previousAnswer]);
 
   return (
     <BoxStyled>
-      {outputValue}
+      <OverFlowProtect>
+        <h4>
+          {outputValue}
+        </h4>
+      </OverFlowProtect>
     </BoxStyled>
   )
 }

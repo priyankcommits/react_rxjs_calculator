@@ -1,3 +1,5 @@
+// Contains all constants related to Appplication
+
 export const buttonTypes = {
     NUMBER: 'number',
     OPERATOR: 'operator',

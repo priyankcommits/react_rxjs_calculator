@@ -1,3 +1,4 @@
+// Main Container Component
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container'; 
@@ -18,7 +19,7 @@ function App() {
         <h3>Calculator using React Hooks + RxJS</h3>
       </Row>
       <Row className='mt-2'>
-        <Col md={6}>
+        <Col md={6} lg={8}>
           <BoxStyled>
             <Row className='m-1'>
               <Col md={6}>

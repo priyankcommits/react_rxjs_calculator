@@ -1,8 +1,10 @@
-import React, { useEffect, useReducer } from 'react';
+// Component to show user input and has all input rules as business logic in reducer
+// Listens to ButtonLayout and Publishes to OutputBox
+import React, { useEffect, useReducer, useState } from 'react';
 import { skip } from 'rxjs/operators';
 
-import { BoxStyled } from '../styles';
-import { buttonEvent$, resultEvent$ } from '../events';
+import { BoxStyled, OverFlowProtect } from '../styles';
+import { buttonEvent$, operationEvent$ } from '../events';
 import { buttonTypes, operators } from '../constants';
 
 const initialState = {
@@ -47,13 +49,15 @@ const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
         paranthesisCount: 1,
       }
     case buttonTypes.PARANTHESIS_OPEN:
+      value = `${currentEntry.value.name}`;
+      if (!previousTypeIsOperator || previousTypeIsParanthesisOpen) value = ` ${operators.MULTIPLY} ${value}`;
       return {
         ...initialState,
-        value: `${currentEntry.value.name}`,
+        value: value,
         paranthesisCount: 1,
       }
     case buttonTypes.PARANTHESIS_CLOSE:
-      if (paranthesisCount > 0) {
+      if (paranthesisCount > 0 && !previousTypeIsParanthesisOpen) {
         return {
           ...initialState,
           value: `${currentEntry.value.name}`,
@@ -94,16 +98,17 @@ const reducer = (state, action) => {
     let newState = {...initialState};
     let previousType = null;
     let canPoint = true;
-    newState.paranthesisCount = state.paranthesisCount;
+    let paranthesisCount = 0;
     state.entries.forEach(entry => {
-      const result = ruleBook(previousType, entry, newState.paranthesisCount, canPoint);
+      const result = ruleBook(previousType, entry, paranthesisCount, canPoint);
       newState.value = `${newState.value}${result.value}`;
       newState.entries = [...newState.entries, entry];
-      newState.paranthesisCount += result.paranthesisCount;
+      paranthesisCount += result.paranthesisCount;
       previousType = entry.type;
       if (entry.type === buttonTypes.POINT) canPoint = false;
       if (entry.type === buttonTypes.OPERATOR && !canPoint) canPoint = true;
     });
+    newState.paranthesisCount = paranthesisCount;
     return {newState, previousType, canPoint};
   }
 
@@ -141,6 +146,7 @@ const reducer = (state, action) => {
 function InputBox() {
 
   const [inputState, setInputState] = useReducer(reducer, initialState);
+  const [paranthesisPrediction, setParanthesisPrediction] = useState('');
 
   useEffect(() => {
     buttonEvent$.pipe(skip(1)).subscribe(data => {
@@ -148,17 +154,23 @@ function InputBox() {
     });
     return () => {
       buttonEvent$.unsubscribe();
-      resultEvent$.unsubscribe();
+      operationEvent$.unsubscribe();
     }
   }, []);
 
   useEffect(() => {
-    resultEvent$.next(inputState.value);
+    const paranthesisPrediction = ')'.repeat(inputState.paranthesisCount);
+    setParanthesisPrediction(paranthesisPrediction);
+    operationEvent$.next(`${inputState.value}${paranthesisPrediction}`);
   }, [inputState]);
 
   return (
     <BoxStyled>
-      {inputState.value}
+      <OverFlowProtect>
+        <h4>
+          {inputState.value}<span className='text-danger'>{paranthesisPrediction}</span>
+        </h4>
+      </OverFlowProtect>
     </BoxStyled>
   )
 }

@@ -1,3 +1,4 @@
+// Main styles and share styles go here
 import styled from 'styled-components';
 
 
@@ -15,5 +16,9 @@ export const BoxStyled = styled.div`
   border-color: lightgray;
   border-radius: 5px;
   text-align: right;
-  min-height: 30px;
+  min-height: 50px;
+`
+
+export const OverFlowProtect = styled.div`
+  overflow-wrap: break-word;
 `

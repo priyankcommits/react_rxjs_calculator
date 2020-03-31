@@ -1,3 +1,5 @@
+// Component to display all claculator buttons from constants file
+// Publishes button clicks to InputBox
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import React from 'react';
