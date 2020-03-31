@@ -9,3 +9,6 @@ export const operationEvent$ = new BehaviorSubject(0);
 
 // Used for sending results to history component
 export const resultEvent$ = new BehaviorSubject(0);
+
+// Used for selecting a value from history and sending to input box
+export const resultSelectionEvent$ = new BehaviorSubject(0);

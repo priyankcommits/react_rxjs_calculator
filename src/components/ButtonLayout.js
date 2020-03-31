@@ -2,7 +2,7 @@
 // Publishes button clicks to InputBox
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Row from 'react-bootstrap/Row';
 
 import { buttonEvent$ } from '../events';
@@ -12,6 +12,24 @@ function ButtonLayout(props) {
   const publishButtonEvent = (value, type) => {
     buttonEvent$.next({value, type});
   }
+
+  useEffect(() => {
+    let buttonHandlers = [];
+    props.buttons.forEach(button => {
+      let buttonEventHandler = (event) => {
+        if (event.key === button.keyEvent) {
+          buttonEvent$.next({value: button.value, type: button.type});
+        }
+      };
+      document.addEventListener('keyup', buttonEventHandler);
+      buttonHandlers.push(buttonEventHandler);
+    });
+    return () => {
+      buttonHandlers.forEach(buttonHandler => {
+        document.removeEventListener('keyup', buttonHandler);
+      });
+    }
+  });
 
   return (
     <div>

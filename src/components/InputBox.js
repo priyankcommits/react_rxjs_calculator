@@ -4,7 +4,7 @@ import React, { useEffect, useReducer, useState } from 'react';
 import { skip } from 'rxjs/operators';
 
 import { BoxStyled, OverFlowProtect } from '../styles';
-import { buttonEvent$, operationEvent$ } from '../events';
+import { buttonEvent$, operationEvent$, resultSelectionEvent$ } from '../events';
 import { buttonTypes, operators } from '../constants';
 
 const initialState = {
@@ -87,8 +87,9 @@ const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
 
 const reducer = (state, action) => {
   if (action.type === buttonTypes.RESET) return {...initialState};
+  if (action.type === 'history') return {...initialState, value: action.value.name};
 
-   if (state.entries.length === 0 && ![buttonTypes.UNDO, buttonTypes.REDO].includes(action.type)) {
+  if (state.entries.length === 0 && ![buttonTypes.UNDO, buttonTypes.REDO].includes(action.type)) {
     const newState = ruleBook(null, action);
     newState.entries = [action];
     return {...newState};
@@ -109,6 +110,7 @@ const reducer = (state, action) => {
       if (entry.type === buttonTypes.OPERATOR && !canPoint) canPoint = true;
     });
     newState.paranthesisCount = paranthesisCount;
+    newState.historyEntries = state.historyEntries;
     return {newState, previousType, canPoint};
   }
 
@@ -151,6 +153,9 @@ function InputBox() {
   useEffect(() => {
     buttonEvent$.pipe(skip(1)).subscribe(data => {
       setInputState(data);
+    });
+    resultSelectionEvent$.pipe(skip(1)).subscribe(data => {
+      setInputState({type: 'history', value: {name: data}});
     });
     return () => {
       buttonEvent$.unsubscribe();
