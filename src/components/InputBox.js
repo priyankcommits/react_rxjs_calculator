@@ -53,7 +53,7 @@ const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
       }
     case buttonTypes.PARANTHESIS_OPEN:
       value = `${currentEntry.value.name}`;
-      if (!previousTypeIsOperator || previousTypeIsParanthesisOpen) value = ` ${operators.MULTIPLY} ${value}`;
+      if (!previousTypeIsOperator && !previousTypeIsParanthesisOpen) value = ` ${operators.MULTIPLY} ${value}`;
       return {
         ...initialState,
         value: value,

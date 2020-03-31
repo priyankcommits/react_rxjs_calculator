@@ -22,7 +22,7 @@ function App() {
         <Information buttons={calculatorButtons} />
       </Row>
       <Row className='mt-3'>
-        <Col md={6} lg={8}>
+        <Col md={8} lg={10}>
           <BoxStyled>
             <Row className='m-1'>
               <Col xs={1}>

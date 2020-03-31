@@ -10,27 +10,23 @@ import { operationEvent$, resultEvent$ } from '../events';
 function OutputBox() {
 
   const [outputValue, setOutputValue] = useState('');
-  const [previousAnswer, setPreviousAsnwer] = useState('');
+  const [previousAnswer, setPreviousAnswer] = useState('');
 
   const executeMathFunction = useCallback(async data => {
     let response = await mathService(data, previousAnswer);
     if (!isNaN(response)) {
       setOutputValue(response);
-      setPreviousAsnwer(response);
+      setPreviousAnswer(response);
       resultEvent$.next({input: data, value: response});
     }
     return response;
-  }, []);
+  }, [previousAnswer]);
 
   useEffect(() => {
     const operationEvent = operationEvent$.pipe(skip(1));
     operationEvent.pipe(delay(333)).subscribe(data => {
       executeMathFunction(data);
     });
-    return () => {
-      operationEvent$.unsubscribe();
-      resultEvent$.unsubscribe();
-    }
   }, [executeMathFunction]);
 
   return (
@@ -44,4 +40,4 @@ function OutputBox() {
   )
 }
 
-export default OutputBox;
+export default React.memo(OutputBox);

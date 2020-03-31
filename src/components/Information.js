@@ -14,7 +14,7 @@ function Information(props) {
 
   return (
     <>
-      <Button variant="dark" onClick={handleShow} size='sm' className='m-1 ml-3'>
+      <Button variant='dark' onClick={handleShow} size='sm' className='m-1 ml-3'>
         i
       </Button>
 
@@ -22,7 +22,7 @@ function Information(props) {
         <Modal.Header closeButton>
           <Modal.Title>
             Keyboard Shorcuts
-            <Badge variant="secondary" className='ml-2'>
+            <Badge variant='secondary' className='ml-2'>
               <h6>
                 Button : Shortcut
               </h6>
@@ -33,7 +33,7 @@ function Information(props) {
           <Row>
               {props.buttons.map((button, index) => (
                 <Col xs={4} className='my-1' key={index}>
-                  <Badge variant="secondary">
+                  <Badge variant='secondary'>
                     <h5>
                       {button.value.name} : {button.keyEvent}
                     </h5>

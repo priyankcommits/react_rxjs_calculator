@@ -52,7 +52,7 @@ function History() {
 
   return (
     <>
-      <Button variant="dark" onClick={handleShow} size='sm' className='mt-1'>
+      <Button variant='dark' onClick={handleShow} size='sm' className='mt-1'>
         h
       </Button>
 

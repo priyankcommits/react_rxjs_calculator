@@ -1,4 +1,4 @@
-import claculatorButtons, { buttonTypes, operators } from "./constants";
+import claculatorButtons, { buttonTypes, operators } from './constants';
 
 describe('Constants', () => {
   it('correct number of buttons', () => {
