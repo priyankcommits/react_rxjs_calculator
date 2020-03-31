@@ -7,6 +7,7 @@ import { BoxStyled, OverFlowProtect } from '../styles';
 import { buttonEvent$, operationEvent$, resultSelectionEvent$ } from '../events';
 import { buttonTypes, operators } from '../constants';
 
+// Initial Reducer State
 const initialState = {
   entries: [],
   historyEntries: [],
@@ -16,6 +17,8 @@ const initialState = {
 }
 
 const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
+  // Function to handle current user input based on previous input
+  // Rules for different types of button inputs
   let value = '';
   const previousTypeIsFunction = previousType === buttonTypes.FUNCTION;
   const previousTypeIsOperator = previousType === buttonTypes.OPERATOR;
@@ -86,15 +89,21 @@ const ruleBook = (previousType, currentEntry, paranthesisCount, canPoint) => {
 }
 
 const reducer = (state, action) => {
+  // Reducer returns initial state on special cases
   if (action.type === buttonTypes.RESET) return {...initialState};
-  if (action.type === 'history') return {...initialState, value: action.value.name};
+  if (action.type === 'history') return {
+    ...initialState, value: action.value.name, entries: [{type: 'number', value: {name: action.value.name}}]};
 
+  // Reducer handles first input
   if (state.entries.length === 0 && ![buttonTypes.UNDO, buttonTypes.REDO].includes(action.type)) {
     const newState = ruleBook(null, action);
     newState.entries = [action];
     return {...newState};
   }
 
+  // Reducer handles subsequent inputs
+  // Iterates over list of input objects every time there is an input to build the final string that is shown to user
+  // This function calls rule book
   const getNewState = state => {
     let newState = {...initialState};
     let previousType = null;
@@ -114,6 +123,7 @@ const reducer = (state, action) => {
     return {newState, previousType, canPoint};
   }
 
+  // Handle undo and redo buttons
   if (action.type === buttonTypes.UNDO) {
     const lastEntry = state.entries[state.entries.length - 1];
     if (lastEntry) {
@@ -137,6 +147,8 @@ const reducer = (state, action) => {
     } else return state;
   }
 
+  // Add current user input
+  // Previous iteration handles only previous state as this is a reducer
   const {newState, previousType, canPoint} = getNewState(state);
   const result = ruleBook(previousType, action, newState.paranthesisCount, canPoint);
   newState.value = `${newState.value}${result.value}`;
@@ -151,19 +163,23 @@ function InputBox() {
   const [paranthesisPrediction, setParanthesisPrediction] = useState('');
 
   useEffect(() => {
+    // Receive button inputs
     buttonEvent$.pipe(skip(1)).subscribe(data => {
       setInputState(data);
     });
+    // Receive history selection and update
     resultSelectionEvent$.pipe(skip(1)).subscribe(data => {
       setInputState({type: 'history', value: {name: data}});
     });
     return () => {
       buttonEvent$.unsubscribe();
       operationEvent$.unsubscribe();
+      resultSelectionEvent$.unsubscribe();
     }
   }, []);
 
   useEffect(() => {
+    // handle case of end paranthesis not entered by user
     const paranthesisPrediction = ')'.repeat(inputState.paranthesisCount);
     setParanthesisPrediction(paranthesisPrediction);
     operationEvent$.next(`${inputState.value}${paranthesisPrediction}`);

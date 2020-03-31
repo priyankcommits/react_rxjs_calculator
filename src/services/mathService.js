@@ -27,7 +27,7 @@ const mathService = async (data, previousAnswer) => {
 
   const timeEnd = performance.now();
   const totalTime = timeEnd - timeStart;
-  if (result === undefined) result = '';
+  if (result === undefined) result = previousAnswer;
   if (totalTime < 1000) {
     await new Promise(resolve => setTimeout(resolve, 1000 - totalTime));
     return result;

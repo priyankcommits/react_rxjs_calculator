@@ -12,17 +12,14 @@ function OutputBox() {
   const [outputValue, setOutputValue] = useState('');
   const [previousAnswer, setPreviousAsnwer] = useState('');
 
-  const executeMathFunction = useCallback((data) => {
-    const result = async () => {
-      let response = await mathService(data, previousAnswer);
-      if (!isNaN(response)) {
-        setOutputValue(response);
-        setPreviousAsnwer(response);
-        resultEvent$.next({input: data, value: response});
-      }
-      return response;
-    };
-    return result();
+  const executeMathFunction = useCallback(async data => {
+    let response = await mathService(data, previousAnswer);
+    if (!isNaN(response)) {
+      setOutputValue(response);
+      setPreviousAsnwer(response);
+      resultEvent$.next({input: data, value: response});
+    }
+    return response;
   }, []);
 
   useEffect(() => {

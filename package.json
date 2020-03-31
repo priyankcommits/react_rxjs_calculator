@@ -8,6 +8,7 @@
     "bootstrap": "^4.4.1",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
+    "jest-styled-components": "^7.0.0",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.1",
@@ -18,7 +19,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --coverage --watchAll",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
