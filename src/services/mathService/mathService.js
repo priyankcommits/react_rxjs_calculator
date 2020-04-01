@@ -4,6 +4,10 @@ import { replaceAll } from '../../shared/utils/index';
 const mathService = async (data, previousAnswer) => {
   const timeStart = performance.now();
   let temp = data;
+  if (temp.indexOf('0') === 0) {
+    temp = temp.replace('0', '');
+  }
+
   temp = replaceAll(temp, 'x', '*');
   temp = replaceAll(temp, '÷', '/');
   temp = replaceAll(temp, 'pow', '**');
