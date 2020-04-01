@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Output Box Initial Rendering 1`] = `
+<div
+  className="sc-AxirZ bQmHBL"
+>
+  <div
+    className="sc-AxiKw eGDepq"
+  >
+    <h4>
+      
+    </h4>
+  </div>
+</div>
+`;

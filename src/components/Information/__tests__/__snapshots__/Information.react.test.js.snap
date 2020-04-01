@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Information Initial Rendering 1`] = `
+<div
+  className="sc-AxhCb kgMfC mt-1 ml-2 btn btn-dark btn-sm"
+  disabled={false}
+  onClick={[Function]}
+>
+  <span
+    className="mx-1"
+  >
+    i
+  </span>
+</div>
+`;

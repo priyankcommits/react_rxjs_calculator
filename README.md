@@ -14,6 +14,7 @@ PS: I had some problems with NPM on my mac with the latest OS. Prefer using Yarn
 2. RxJS for event based communication between components
 3. React Bootstrap for CSS foundation
 4. Styled components for customising CSS
+5. Functional testing using jest and enzyme, snapshot testing using react test utils
 
 ### Features Implemented:
 1. Functions - Sin, Cos, Tan, Log, Ln, Pow

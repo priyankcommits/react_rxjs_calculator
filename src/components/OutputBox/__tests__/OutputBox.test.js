@@ -6,7 +6,7 @@ Enzyme.configure({ adapter: new Adapter() });
 
 import { OutputBox } from '../OutputBox';
 
-describe('OutpuxBox Component', () => {
+describe('OutputBox Component', () => {
   let wrapper;
   beforeEach(() => {
     wrapper = mount(<OutputBox />);
