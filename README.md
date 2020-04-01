@@ -39,3 +39,4 @@ Otherwise, writing PEDMAS would take a long time, not implementing PEDMAS and go
 ### Improvements that can be made:
 1. More test coverage
 2. Slightly better styling
+3. More scientific functions can be extended easily due to modularity
